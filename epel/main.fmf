@@ -1,0 +1,4 @@
+summary: epel library reference
+contact: Dalibor Pospíšil <dapospis@redhat.com>
+require:
+- library(epel/epel)
