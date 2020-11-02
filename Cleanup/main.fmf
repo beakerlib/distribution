@@ -1,0 +1,4 @@
+summary: Cleanup library reference
+contact: Dalibor Pospíšil <dapospis@redhat.com>
+require:
+- library(ControlFlow/Cleanup)
