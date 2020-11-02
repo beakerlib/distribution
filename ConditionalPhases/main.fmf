@@ -1,0 +1,4 @@
+summary: ConditionalPhases library reference
+contact: Dalibor Pospíšil <dapospis@redhat.com>
+require:
+- library(ControlFlow/ConditionalPhases)
