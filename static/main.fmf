@@ -1,0 +1,5 @@
+summary: static file checking
+contact: Alois Mahdal <amahdal@redhat.com>
+framework: beakerlib
+require:
+- library(distribution/dump)
