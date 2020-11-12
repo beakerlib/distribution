@@ -1,0 +1,4 @@
+summary: RpmSnapshot library reference
+contact: Dalibor Pospíšil <dapospis@redhat.com>
+require:
+- library(rpm/snapshot)
