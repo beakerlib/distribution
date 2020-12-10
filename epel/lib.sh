@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epelWrapper
-#   library-version = 1
+#   library-version = 2
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_wrapper_LIB_VERSION=1
+__INTERNAL_epel_wrapper_LIB_VERSION=2
 __INTERNAL_epel_wrapper_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -39,7 +39,7 @@ This is a compatibility layer to overcome a transitional phase from
 distribution/epel to epel/epel.
 
 =cut
-echo -n "loading library $__INTERNAL_epel_LIB_NAME v$__INTERNAL_epel_LIB_VERSION... "
+echo -n "loading library $__INTERNAL_epel_wrapper_LIB_NAME v$__INTERNAL_epel_wrapper_LIB_VERSION... "
 
 # epelWrapperLibraryLoaded ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {{{
 epelWrapperLibraryLoaded() {
