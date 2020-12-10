@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = CleanupWrapper
-#   library-version = 1
+#   library-version = 2
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_Cleanup_wrapper_LIB_VERSION=1
+__INTERNAL_Cleanup_wrapper_LIB_VERSION=2
 __INTERNAL_Cleanup_wrapper_LIB_NAME='distribution/Cleanup'
 : <<'=cut'
 =pod
@@ -39,7 +39,7 @@ This is a compatibility layer to overcome a transitional phase from
 distribution/Cleanup to ControlFLow/Cleanup.
 
 =cut
-echo -n "loading library $__INTERNAL_Cleanup_LIB_NAME v$__INTERNAL_Cleanup_LIB_VERSION... "
+echo -n "loading library $__INTERNAL_Cleanup_wrapper_LIB_NAME v$__INTERNAL_Cleanup_wrapper_LIB_VERSION... "
 
 # epelWrapperLibraryLoaded ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {{{
 CleanupWrapperLibraryLoaded() {
