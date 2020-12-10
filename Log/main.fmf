@@ -1,0 +1,8 @@
+summary: More fine-grade logging solution
+description: |
+    The library add maily further DEBUG levels.
+    
+    There's also a ability to act as a standalone logging facility.
+contact: Dalibor Pospíšil <dapospis@redhat.com>
+require:
+- library(distribution/opts)

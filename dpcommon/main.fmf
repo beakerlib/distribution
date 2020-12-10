@@ -1,0 +1,10 @@
+summary: A meta library bringing other libraries
+decsription: |
+    Besides the meta library there are also
+    functions with an ambition to reach beakerlib itself.
+contact: Dalibor Pospíšil <dapospis@redhat.com>
+require:
+- /usr/bin/bc
+- library(distribution/tcf)
+- library(distribution/RpmSnapshot)
+- library(distribution/Cleanup)

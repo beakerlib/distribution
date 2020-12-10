@@ -1,0 +1,4 @@
+summary: simplified interface to getopts processing
+contact: Dalibor Pospíšil <dapospis@redhat.com>
+#require:
+#- library(distribution/Log)

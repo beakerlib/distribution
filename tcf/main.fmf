@@ -1,0 +1,4 @@
+summary: Block style coding with ability of skipping parts
+contact: Dalibor Pospíšil <dapospis@redhat.com>
+require:
+- library(distribution/Log)
