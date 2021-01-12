@@ -1,0 +1,5 @@
+summary: This library provides functions for maintaining test users.
+contact:
+- Dalibor Pospisil <dapospis@redhat.com>
+require:
+  - library(distribution/Log)
