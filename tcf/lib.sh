@@ -212,7 +212,7 @@ __INTERNAL_tcf_do_hack() {
         true; rljAddTest() {
           local a="$1"; shift
           [[ "$1" != "FAIL" ]]; tcfE2R
-          __INTERNAL_tcf_journal=("${__INTERNAL_tcf_journal[@]}" "$1" "$a")
+          __INTERNAL_tcf_journal+=("$1" "$a")
           __INTERNAL_tcf_orig_rljAddTest "$a" "$@"
         }
       else
@@ -221,7 +221,7 @@ __INTERNAL_tcf_do_hack() {
         true; rljAddTest() {
           local a="${__INTERNAL_Log_prefix}$1"; shift
           [[ "$1" != "FAIL" ]]; tcfE2R
-          __INTERNAL_tcf_journal=("${__INTERNAL_tcf_journal[@]}" "$1" "$a")
+          __INTERNAL_tcf_journal+=("$1" "$a")
           __INTERNAL_tcf_orig_rljAddTest "$a" "$@"
         }
         echo -n ", rlLog"
@@ -232,7 +232,7 @@ __INTERNAL_tcf_do_hack() {
         __INTERNAL_tcf_copy_function rljAddMessage __INTERNAL_tcf_orig_rljAddMessage
         true; rljAddMessage() {
           local a="${__INTERNAL_Log_prefix}$1"; shift
-          __INTERNAL_tcf_journal=("${__INTERNAL_tcf_journal[@]}" "$1" "$a")
+          __INTERNAL_tcf_journal+=("$1" "$a")
           __INTERNAL_tcf_orig_rljAddMessage "$a" "$@"
         }
       fi
