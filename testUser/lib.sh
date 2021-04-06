@@ -21,7 +21,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = testUser
-#   library-version = 9
+#   library-version = 10
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 : <<'=cut'
 =pod
@@ -118,7 +118,7 @@ echo -n "loading library testUser... "
 Creates/removes testing user(s).
 
     rlPhaseStartSetup
-        testUserSetup [NUM]
+        testUserSetup [--fast] [NUM]
     rlPhaseEnd
 
     rlPhaseStartCleanup
@@ -126,6 +126,15 @@ Creates/removes testing user(s).
     rlPhaseEnd
 
 =over
+
+=item --fast
+
+Use newusers, mkdir, chmod, and chown for user(s) creation.
+And direct home dir removal, edit of /etc/passwd, /etc/shadow, /etc/group,
+and /etc/gshadow/ for user(s) removal.
+
+This will be automatically propagated to testUserAdd and testUserDel is called
+separately.
 
 =item NUM
 
@@ -140,10 +149,14 @@ Returns 0 if success.
 
 testUserDefaultName="testuser"
 testUserDefaultPasswd="foobar"
+__INTERNAL_testUser_fast=0
 
 
 testUserSetup() {
-  testUserAdd $1
+  [[ "$1" == '--fast' ]] && {
+    __INTERNAL_testUser_fast=1
+  }
+  testUserAdd "$@"
 }
 
 
@@ -154,11 +167,17 @@ testUserSetup() {
 
 Creates/removes further testing user(s).
 
-    testUserAdd [NUM]
-    testUserDel [USERNAME]
-    testUserDel
+    testUserAdd [--fast] [NUM]
+    testUserDel [--fast] [USERNAME]
+    testUserDel [--fast]
 
 =over
+
+=item --fast
+
+Use newusers, mkdir, chmod, and chown for user(s) creation.
+And direct home dir removal, edit of /etc/passwd, /etc/shadow, /etc/group,
+and /etc/gshadow/ for user(s) removal.
 
 =item NUM
 
@@ -179,39 +198,92 @@ __INTERNAL_testUser_index=0
 testUserAdd() {
   # parameter dictates how many users should be created, defaults to 1
   local res count_created count_wanted newUser newUserPasswd
+  local fast=0
+  [[ "$1" == '--fast' || $__INTERNAL_testUser_fast -eq 1 ]] && {
+    fast=1
+    shift
+  }
   res=0
   count_created=0
   count_wanted=${1:-"1"}
   (( $count_wanted < 1 )) && return 1
 
-  while (( $count_created != $count_wanted ));do
+  while (( $count_created != $count_wanted )) ; do
     let __INTERNAL_testUser_index++
     newUser="$testUserDefaultName${__INTERNAL_testUser_index}"
     newUserPasswd="$testUserDefaultPasswd"
     id "$newUser" &> /dev/null && continue # if user with the name exists, try again
 
     # create
-    LogDebug -f "creating user $newUser"
+    LogDebug -f "creating first user $newUser"
     useradd -m $newUser >&2 || ((res++))
     echo "$newUserPasswd" | passwd --stdin $newUser || ((res++))
 
     # save the users array
     testUser+=($newUser)
     testUserPasswd+=($newUserPasswd)
-    set | grep -E "^(__INTERNAL_testUser_index|testUser|testUserPasswd)="> $__INTERNAL_testUser_users_file
     ((count_created++))
+    [[ $fast -eq 1 ]] && break
   done
+
   __INTERNAL_testUserRefillInfo || ((res++))
 
-  echo ${res}
+  [[ $count_wanted -eq 1 ]] || [[ $fast -eq 0 ]] && {
+    [[ $res -eq 0 ]]
+    return $?
+  }
+
+  while (( $count_created != $count_wanted )) ; do
+    let __INTERNAL_testUser_index++
+    newUser="$testUserDefaultName${__INTERNAL_testUser_index}"
+    newUserPasswd="$testUserDefaultPasswd"
+    id "$newUser" &> /dev/null && continue # if user with the name exists, try again
+
+    # save the users array
+    testUser+=($newUser)
+    testUserPasswd+=($newUserPasswd)
+    ((count_created++))
+  done
+
+  LogInfo "creating $((count_wanted-1)) users in a batch"
+  local i
+  local home="$(dirname "$testUserHomeDir")"
+  local usersI=( ${!testUser[@]} )
+
+  # process all users but the first one
+  for i in ${usersI[@]:1}; do
+    echo "${testUser[$i]}:${testUserPasswd[$i]}::::$home/${testUser[$i]}:$testUserShell"
+  done | newusers
+
+  __INTERNAL_testUserRefillInfo || ((res++))
+
+  # process all users but the first one
+  for i in ${usersI[@]:1}; do
+    mkdir -p "${testUserHomeDir[$i]}"
+    chown -R ${testUser[$i]}:${testUserGroup[$i]} "${testUserHomeDir[$i]}"
+    chmod 755 "${testUserHomeDir[$i]}"
+  done
+
   [[ $res -eq 0 ]]
 }
 
 
 __INTERNAL_testUserDel() {
   local res
-  userdel -rf ${testUser[$1]}
-  res=$?
+  local fast=$1
+  shift
+  if [[ $fast -eq 0 ]]; then
+    userdel -rf ${testUser[$1]}
+    res=$?
+  else
+    sed -r -i "/^${testUser[$1]}:/d" /etc/passwd || let res++
+    sed -r -i "/^${testUser[$1]}:/d" /etc/shadow || let res++
+    sed -r -i "/^${testUserGroup[$1]}:/d" /etc/group || let res++
+    sed -r -i "/^${testUserGroup[$1]}:/d" /etc/gshadow || let res++
+    sed -r -i "s/\<${testUser[$1]},//;s/,${testUser[$1]}\>//" /etc/group || let res++
+    rm -rf "${testUserHomeDir[$1]}" || let res++
+  fi
+
   unset \
     testUser[$1] \
     testUserPasswd[$1] \
@@ -230,6 +302,12 @@ __INTERNAL_testUserDel() {
 
 testUserDel() {
   local res count_deleted count_wanted i j users
+  local fast=0
+  [[ "$1" == '--fast' || $__INTERNAL_testUser_fast -eq 1 ]] && {
+    fast=1
+    shift
+    rlLogInfo "Using fast removal approach"
+  }
   res=0
   [[ -z "$1" ]] && {
     users=("${testUser[@]}")
@@ -240,12 +318,13 @@ testUserDel() {
     for j in "${!users[@]}"; do
       if [[ "${testUser[$i]}" == "${users[$j]}" ]]; then
         LogDebug -f "deleting user ${testUser[$i]}"
-        __INTERNAL_testUserDel $i || let res++
+        __INTERNAL_testUserDel $fast $i || let res++
         unset users[$j]
         break
       fi
     done
   done
+  [[ $res -eq 0 ]]
 }
 
 
@@ -267,6 +346,8 @@ __INTERNAL_testUserRefillInfo() {
     fi
   done
 
+  set | grep -E "^(__INTERNAL_testUser_fast|__INTERNAL_testUser_index|testUser|testUserPasswd)="> $__INTERNAL_testUser_users_file
+
   [[ $res -eq 0 ]]
 }
 
@@ -274,7 +355,7 @@ __INTERNAL_testUserRefillInfo() {
 testUserCleanup() {
   local res
   res=0
-  testUserDel
+  testUserDel || ((res++))
   rm -f $__INTERNAL_testUser_users_file >&2 || ((res++))
 
   [[ $res -eq 0 ]]
