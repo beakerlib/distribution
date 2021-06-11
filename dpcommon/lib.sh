@@ -22,7 +22,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = dpcommon
-#   library-version = 19
+#   library-version = 20
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 : <<'=cut'
 =pod
@@ -199,7 +199,7 @@ ReplaceInFile() {
 }
 
 value_difference_percentage() {
-  local a="scale=10; h=($1); l=($2); if ( h < l ) { a=h; h=l; l=a; }; d=h-l; if (h<0) h=-h; if (l<0) l=-l; if ( h < l ) { a=h; h=l; l=a; }; if ( l != 0 ) d/l*100 else 1000000000000000000000000000"
+  local a="scale=10; h=($1); l=($2); if ( h==l ) 0 else { if ( h < l ) { a=h; h=l; l=a; }; d=h-l; if (h<0) h=-h; if (l<0) l=-l; if ( h < l ) { a=h; h=l; l=a; }; if ( l != 0 ) d/l*100 else 1000000000000000000000000000 }"
   rlLogDebug "value diff: $a"
   echo $a | bc | sed -e 's/^\./0\0/'
 }
@@ -208,7 +208,7 @@ compare_with_tolerance() {
   rlLog "check that $1 and $2 does not differ more than $3%"
   local v=$(value_difference_percentage $1 $2 |cut -d . -f 1)
   rlLog "values differ by $v%"
-  [ $v -le $3 ]
+  [[ $v -le $3 ]]
 }
 
 LOOKASIDE="${LOOKASIDE:-http://porkchop.redhat.com/qa/rhts/lookaside}"
