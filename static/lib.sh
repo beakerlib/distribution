@@ -593,7 +593,7 @@ __distribution_static__ck_syntax_python_guessbin() {
         eval "$it_was_P"
     else
         rlLogWarning \
-            "$(rstatic__hint): could not guess python binary path, falling back to /usr/bin/python" \
+            "$(distribution_static__cmt): could not guess python binary path, falling back to /usr/bin/python" \
             "hint: to avoid this warning, add 'syntax.python:pybin=/correct/binary' to distribution_static__bltnopts."
         echo "/usr/bin/python"
         return 2
