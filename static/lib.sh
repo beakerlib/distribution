@@ -592,9 +592,8 @@ __distribution_static__ck_syntax_python_guessbin() {
     elif grep -q '/usr/bin/platform-python\>' <<<"$reqs"; then
         eval "$it_was_P"
     else
-        rlLogWarning \
-            "$(distribution_static__cmt): could not guess python binary path, falling back to /usr/bin/python" \
-            "hint: to avoid this warning, add 'syntax.python:pybin=/correct/binary' to distribution_static__bltnopts."
+        rlLogWarning "$(distribution_static__cmt): could not guess python binary path, falling back to /usr/bin/python"
+        rlLogWarning "hint: to avoid this warning, add 'syntax.python:pybin=/correct/binary' to distribution_static__bltnopts."
         echo "/usr/bin/python"
         return 2
     fi
