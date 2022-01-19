@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = Log
-#   library-version = 14
+#   library-version = 15
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_Log_LIB_VERSION=14
+__INTERNAL_Log_LIB_VERSION=15
 : <<'=cut'
 =pod
 
@@ -559,6 +559,93 @@ LogVar() {
 }; # end of LogVar }}}
 
 
+LogProgressHeader() {
+  __INTERNAL_logprogress_refresh=''
+  [[ -t 2 ]] && { __INTERNAL_logprogress_refresh='1'; }
+  __INTERNAL_logprogress_pattern=""
+  __INTERNAL_logprogress_pattern_fill=""
+  __INTERNAL_logprogress_max=$1
+  __INTERNAL_logprogress_min=${2:-0}
+  __INTERNAL_logprogress_size=$(($__INTERNAL_logprogress_max-$__INTERNAL_logprogress_min))
+  [[ $__INTERNAL_logprogress_size -eq 0 ]] && __INTERNAL_logprogress_size=1
+  __INTERNAL_logprogress_width=${3:-70}
+  __INTERNAL_logprogress_prev=-1
+  [[ -n "$DEBUG" ]] && declare -p __INTERNAL_logprogress_max __INTERNAL_logprogress_min __INTERNAL_logprogress_size __INTERNAL_logprogress_width __INTERNAL_logprogress_prev
+  #echo -n '|' >&2
+  local prev i header_pattern cur next
+  header_pattern=""
+  for ((i=1;i<__INTERNAL_logprogress_width;i++)); do
+    cur=$((10*i/__INTERNAL_logprogress_width))
+    next=$((10*(i+1)/__INTERNAL_logprogress_width))
+    next2=$((10*(i+2)/__INTERNAL_logprogress_width/10))
+    if [[ $next -ne $cur ]]; then
+      header_pattern+="_|"
+      let i++
+    else
+      header_pattern+="_"
+      __INTERNAL_logprogress_pattern+="#"
+      __INTERNAL_logprogress_pattern_fill+=" "
+    fi
+    prev=$cur
+  done
+  [[ -n "$__INTERNAL_logprogress_refresh" ]] && {
+    __INTERNAL_logprogress_pattern_fill=${header_pattern//_/#}
+    __INTERNAL_logprogress_pattern=${header_pattern//_/ }
+    LogProgressDraw $__INTERNAL_logprogress_min
+    return
+  }
+  echo -e "$header_pattern" >&2
+}
+
+LogProgressDraw() {
+  local cur p i pro
+  p=$1
+  [[ $p -lt $__INTERNAL_logprogress_min ]] && p=$__INTERNAL_logprogress_min
+  [[ $p -gt $__INTERNAL_logprogress_max ]] && p=$__INTERNAL_logprogress_max
+  cur=$(( $__INTERNAL_logprogress_width * ($p-$__INTERNAL_logprogress_min) / $__INTERNAL_logprogress_size))
+  if [[ $cur -gt $__INTERNAL_logprogress_prev ]]; then
+    if [[ -n "$__INTERNAL_logprogress_refresh" ]]; then
+      let i=$cur-2
+      [[ $i -lt 0 ]] && i=0
+      pro=$(( 100 * ($p-$__INTERNAL_logprogress_min) / $__INTERNAL_logprogress_size))
+      [[ $p -eq $__INTERNAL_logprogress_max ]] && p="${__INTERNAL_logprogress_pattern_fill}" || \
+      p="${__INTERNAL_logprogress_pattern_fill:0:$i}##"
+      echo -en "\r" >&2
+      echo -n "${p:0:$cur}${__INTERNAL_logprogress_pattern:$cur} $pro%" >&2
+    elif [[ $__INTERNAL_logprogress_prev -ge 0 ]]; then
+      for ((i=__INTERNAL_logprogress_prev; i<cur; i++)); do
+        echo -n '^' >&2
+      done
+    fi
+    __INTERNAL_logprogress_prev=$cur
+  fi
+}
+
+LogProgressFooter() {
+  LogProgressDraw $__INTERNAL_logprogress_max
+  echo >&2
+}
+
+
+LogSleepWithProgress() {
+  local sec=$1 i p wholesec
+  p=$( sleep $sec >/dev/null & echo $! )
+  wholesec=${sec/.*}
+  rlLog "waiting for $sec seconds"
+  local endtime currentime
+  currentime=$(date +%s.%N | sed -r 's/([0-9]+)\.(..).*/\1\2/')
+  endtime=$(($currentime+$wholesec*100))
+  LogProgressHeader $endtime $currentime
+  while currentime=$(date +%s.%N | sed -r 's/([0-9]+)\.(..).*/\1\2/'); [[ $currentime -lt $endtime ]]; do
+    kill -s 0 "$p" &>/dev/null || break
+    sleep 0.25
+    LogProgressDraw $currentime
+  done
+  tail --pid=$p -f -s 0.1 /dev/null
+  LogProgressFooter
+}
+
+
 # __INTERNAL_LogRedirectToBeakerlib ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {{{
 __INTERNAL_LogRedirectToBeakerlib() {
   echo -e "\nrunning inside the beakerlib - redirect own logging functions to beakerlib ones"
@@ -649,4 +736,3 @@ Dalibor Pospisil <dapospis@redhat.com>
 =back
 
 =cut
-
