@@ -571,7 +571,7 @@ __distribution_static__ck_syntax_python_guessbin() {
     local reqs
     local it_was_2='echo /usr/bin/python2; return 0'
     local it_was_3='echo /usr/bin/python3; return 0'
-    local it_was_P='echo /usr/bin/platform-python; return 0'
+    local it_was_P='echo /usr/libexec/platform-python; return 0'
     __distribution_static__opt pybin && return 0
     case $path in
         /usr/lib/python2*) eval "$it_was_2" ;;
@@ -589,7 +589,7 @@ __distribution_static__ck_syntax_python_guessbin() {
         eval "$it_was_2"
     elif grep -q '/usr/bin/python3\>' <<<"$reqs"; then
         eval "$it_was_3"
-    elif grep -q '/usr/bin/platform-python\>' <<<"$reqs"; then
+    elif grep -q '/usr/libexec/platform-python\>' <<<"$reqs"; then
         eval "$it_was_P"
     else
         rlLogWarning "$(distribution_static__cmt): could not guess python binary path, falling back to /usr/bin/python"
