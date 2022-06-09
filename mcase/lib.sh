@@ -1,10 +1,10 @@
 #!/bin/bash
-# Authors: 	Dalibor Pospíšil	<dapospis@redhat.com>
-#   Author: Dalibor Pospisil <dapospis@redhat.com>
+# Authors: 	Martin Klusoň <mkluson@redhat.com>
+#   Author: Martin Klusoň <mkluson@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2020 Red Hat, Inc. All rights reserved.
+#   Copyright (c) 2022 Red Hat, Inc. All rights reserved.
 #
 #   This copyrighted material is made available to anyone wishing
 #   to use, modify, copy, or redistribute it subject to the terms
@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = mcaseWrapper
-#   library-version = 2
+#   library-version = 1
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_mcase_wrapper_LIB_VERSION=2
+__INTERNAL_mcase_wrapper_LIB_VERSION=1
 __INTERNAL_mcase_wrapper_LIB_NAME='distribution/mcase'
 : <<'=cut'
 =pod
@@ -56,7 +56,7 @@ mcaseWrapperLibraryLoaded() {
 
 =item *
 
-Dalibor Pospisil <dapospis@redhat.com>
+Martin Klusoň <mkluson@redhat.com>
 
 =back
 
