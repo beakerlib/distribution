@@ -1,0 +1,6 @@
+summary: mcase library reference
+contact: Martin Klusoň <mkluson@redhat.com>
+require:
+- library(ControlFlow/mcase)
+- rpm
+- curl
