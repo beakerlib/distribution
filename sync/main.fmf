@@ -1,0 +1,6 @@
+summary: sync library reference
+contact: Ondrej Moris <omoris@redhat.com>
+require:
+- library(sync/sync)
+- rpm
+- curl
