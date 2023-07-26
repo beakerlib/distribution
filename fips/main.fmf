@@ -1,0 +1,6 @@
+summary: fips library reference
+contact: Ondrej Moris <omoris@redhat.com>
+require:
+- library(crypto/fips)
+- rpm
+- curl
