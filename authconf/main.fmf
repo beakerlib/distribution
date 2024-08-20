@@ -3,4 +3,4 @@ require:
   - library(distribution/opts)
   - library(distribution/Log)
   - library(distribution/tcf)
-  - library(pam)
+  - library(pam/pam)
