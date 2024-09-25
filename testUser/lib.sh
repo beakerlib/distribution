@@ -216,7 +216,7 @@ testUserAdd() {
 
     # create
     LogDebug -f "creating first user $newUser"
-    useradd -m $newUser >&2 || ((res++))
+    useradd --no-log-init -m $newUser >&2 || ((res++))
     echo "$newUserPasswd" | passwd --stdin $newUser || ((res++))
 
     # save the users array
