@@ -134,6 +134,7 @@ id_provider         = ldap
 auth_provider       = ldap
 #debug_level         = 0xFFFF
 ldap_uri            = $ldapURI
+ldap_id_use_start_tls = false
 
 entry_cache_nowait_percentage       = 0
 entry_cache_timeout                 = 1
