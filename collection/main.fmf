@@ -1,0 +1,9 @@
+summary: Collection filelist helpers
+contact: Lukas Zachar <lzachar@redhat.com>
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - git
+duration: 10m
+extra-summary: /distribution/Library/collection
+extra-task: /distribution/Library/collection
