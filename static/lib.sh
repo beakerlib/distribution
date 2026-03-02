@@ -607,7 +607,7 @@ __distribution_static__ck_syntax_python() {
     local path=$1       # path to check file at
     local pybin         # path to python binary
     pybin=$(__distribution_static__ck_syntax_python_guessbin)
-    echo "compile(open('$path', 'rU').read(), '', 'exec')" \
+    echo "compile(open('$path', 'r').read(), '', 'exec')" \
       | rlRun "$pybin - 2>err" \
             0 "$CkName:$path"
     distribution_dump__file -E -s err
